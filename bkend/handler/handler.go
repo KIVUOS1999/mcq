@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/mcq_backend/constants"
@@ -112,22 +111,22 @@ func (h *Handler) SubmitMCQ(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *Handler) EvaluteResult(roomID string) string {
+func (h *Handler) EvaluteResult(roomID string) *models.ScoreCard {
 	players, reasonCode := h.storage.ReturnRoomDetails(roomID)
 
 	if reasonCode == constants.ROOM_NOT_FOUND {
-		return ""
+		return nil
 	}
 
 	if len(players) == 0 {
-		return ""
+		return nil
 	}
 
 	mcqArray, err := utils.ReadJSON()
 
 	if err != nil {
 		fmt.Println("Error in ReadJSON", err)
-		return ""
+		return nil
 	}
 
 	result := models.ScoreCard{
@@ -156,37 +155,21 @@ func (h *Handler) EvaluteResult(roomID string) string {
 
 		result.ScoreCard = append(result.ScoreCard, pc)
 	}
-	jsonData, _ := json.Marshal(result)
-	return string(jsonData)
+
+	return &result
 }
 
 func (h *Handler) SSE(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-	w.Header().Set("Content-Type", "text/event-stream")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Connection", "keep-alive")
+	utils.SetHttpHeaders(&w)
+
+	fmt.Println("Sending SSE")
 
 	params := mux.Vars(r)
 	roomID := params[constants.ROOM_ID]
 
-	ticker := time.NewTicker(2 * time.Second)
-	defer ticker.Stop()
+	result := h.EvaluteResult(roomID)
 
-	for {
-		select {
-		case <-ticker.C:
-			message := fmt.Sprintf("data: %s\n\n", h.EvaluteResult(roomID))
-			_, err := w.Write([]byte(message))
-			if err != nil {
-				// Client disconnected
-				return
-			}
-			w.(http.Flusher).Flush()
-		case <-r.Context().Done():
-			// Client disconnected
-			return
-		}
+	if result != nil {
+		json.NewEncoder(w).Encode(result)
 	}
 }

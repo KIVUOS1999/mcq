@@ -31,7 +31,7 @@ function CreateRoom() {
     }
     
     const createRoomAPI = ()=>{
-        const url = paths.base + paths.c_room
+        const url = paths.bigujjknouiknkjjase + paths.c_room
     
         fetch(url)
         .then(res => {

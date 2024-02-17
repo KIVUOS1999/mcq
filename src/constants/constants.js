@@ -1,5 +1,5 @@
 const PATHS = {
-    "base"          :"http://localhost:8000",
+    "base"          :"http://192.168.29.210:8000",
     "g_mcq"         :"/get_mcq",
 	"s_mcq"         :"/submit_mcq",
 	"c_room"        :"/create_room",

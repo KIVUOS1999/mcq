@@ -25,5 +25,5 @@ func main() {
 
 	router.HandleFunc("/event/{room_id}", handler.SSE)
 
-	http.ListenAndServe(":8000", router)
+	http.ListenAndServe("192.168.29.210:8000", router)
 }

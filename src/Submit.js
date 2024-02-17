@@ -1,29 +1,37 @@
 import { useEffect, useState } from "react"
 import { useParams } from 'react-router-dom';
+import constants from './constants/constants'
 
 function Submit() {
     const { roomId } = useParams();
 
     const [parsedJson, setParsedJson] = useState(null)
 
-    useEffect(()=>{
-        const url = 'http://localhost:8000/event/'+roomId
-        const eventSource = new EventSource(url)
-
-        eventSource.onmessage = (event) => {
-            console.log("onMessage")
-            const newEvent = event.data
-            try{
-                setParsedJson(JSON.parse(newEvent))
-            } catch(error) {
-                console.log(`Error ${error}`)
+    const fetchResult = ()=>{
+        {console.log("asking for scorebord")}
+        const url = `${constants.base}/event/${roomId}`
+        fetch(url)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP fetch error: ${res.status}`)
             }
-        }
 
-        return () => {
-            console.log("closing event")
-            eventSource.close()
-        }
+            return res.json()
+        }).then(jsonData => {
+            setParsedJson(jsonData)
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
+    useEffect(() => {
+        fetchResult()
+
+        const interval = setInterval(() => {
+            fetchResult()
+        }, 5000)
+
+        return() => clearInterval(interval)
     }, [])
 
     return(
