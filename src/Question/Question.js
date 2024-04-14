@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import {connect} from "nats.ws";
 
 import paths from '../constants/constants'
 import QuestionOptions from './QuestionOptions'
 
 function Question() {
-    const { roomId, playerId } = useParams();
+    const { roomId, playerId, isAdmin } = useParams();
     const navigate = useNavigate()
     const [questionSet, setQuestionSet] = useState({
         Question: "",
@@ -21,7 +22,25 @@ function Question() {
     const [answer, setAnswer] = useState({})
     const [completed, setCompleted] = useState(false)
 
-    // REST calls
+    const ns = useRef(false)
+
+    const [messages, setMessages] = useState();
+
+    // nats server
+    const connectToNats = async () => {
+        console.log("connecting to nats server from question", roomId)
+        
+        const nc = await connect({ servers: "ws://localhost:4222" });
+        const sub = nc.subscribe(roomId);
+
+        for await (const msg of sub) {
+            setMessages(msg);
+        }
+
+        ns.current = true
+    }
+
+    // getting questions set from server
     const getQuestionSet = () => {
         const url = `${paths.base}${paths.g_mcq}`
         fetch(url)
@@ -41,6 +60,7 @@ function Question() {
         })
     }
 
+    // submitting answers for the player
     const submitAnswersCall = (jsonBody) => {
         const url = `${paths.base}${paths.a_answer}`
         fetch(url, {
@@ -69,8 +89,17 @@ function Question() {
     }
 
     // Use Effects
+    useEffect(() => {
+        if (messages && new TextDecoder().decode(messages._rdata) === "submit_game") {
+            submit()
+        }
+    }, [messages])
+    
     useEffect(()=>{
         getQuestionSet()
+        if (ns.current == false){
+            connectToNats()
+        }
         // eslint-disable-next-line
     }, [])
 
@@ -115,10 +144,11 @@ function Question() {
 
         const jsonPayload = JSON.stringify(preparedJson)
 
+        console.log(jsonPayload)
         submitAnswersCall(jsonPayload)
     }
 
-    return(
+    return (
         <div className="Question Block">
             <h2>{`Welcome ${playerId} in Room: ${roomId}`}</h2>
             {questionSet.Question !== "" && (

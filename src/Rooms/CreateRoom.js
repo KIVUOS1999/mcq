@@ -5,33 +5,15 @@ import paths from "../constants/constants"
 function CreateRoom() {
     const [playerID, setPlayerID] = useState('')
     const [roomID, setRoomID] = useState('')
+
     const navigate = useNavigate();
 
-    const addPlayer = ()=> {
-        const url = paths.base + paths.a_player + roomID +"/player/" +playerID
-        fetch (url)
-        .then(res => {
-            if(!res.ok) {
-                if(res.status === 400) {
-                    res.json().then(errData => {
-                        alert(`Error in JoinRoom: ${errData.response_code}|${errData.reason}`)
-                    })
-                    return
-                }
-                throw new Error(`HTTP: call error: ${res.status}`)
-            }
-
-            alert(`Player successfully added + ${roomID} : ${playerID}`)
-            navigate(`/question/${roomID}/${playerID}`);
-        })
-        .then()
-        .catch(error => {
-            console.error(error)
-        })
+    const navigateToWaitingRoom = ()=> {
+        navigate(`/lobby/${roomID}/${playerID}/1`);
     }
     
     const createRoomAPI = ()=>{
-        const url = paths.bigujjknouiknkjjase + paths.c_room
+        const url = paths.base + paths.c_room
     
         fetch(url)
         .then(res => {
@@ -39,7 +21,7 @@ function CreateRoom() {
             {
                 if(res.status === 400) {
                     res.json().then(errData => {
-                        alert(`Error in JoinRoom: ${errData.response_code}|${errData.reason}`)
+                        alert(`Error in CreateRoom: ${errData.response_code}|${errData.reason}`)
                     })
                     return
                 }
@@ -66,7 +48,7 @@ function CreateRoom() {
 
     useEffect(() => {
         if (roomID !== "" && playerID !== ""){
-            addPlayer()
+            navigateToWaitingRoom()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomID, playerID])

@@ -1,32 +1,14 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from 'react-router-dom';
-import paths from "../constants/constants"
 
 function JoinRoom() {
     const [playerID, setPlayerID] = useState('')
     const [roomID, setRoomID] = useState('')
+    
     const navigate = useNavigate();
 
-    const addPlayer = ()=> {
-        const url = paths.base + paths.a_player + roomID +"/player/" +playerID
-        fetch (url)
-        .then(res => {
-            if(!res.ok) {
-                if(res.status === 400) {
-                    res.json().then(errData => {
-                        alert(`Error in JoinRoom: ${errData.response_code}|${errData.reason}`)
-                    })
-                    return
-                }
-                throw new Error(`HTTP: call error: ${res.status}`)
-            }
-
-            alert(`Player successfully added + ${roomID} : ${playerID}`)
-            navigate(`/question/${roomID}/${playerID}`);
-        })
-        .catch(error => {
-            console.error(error)
-        })
+    const navigateToWaitingRoom = ()=> {
+        navigate(`/lobby/${roomID}/${playerID}/0`);
     }
 
     const addParams = () => {
@@ -39,7 +21,7 @@ function JoinRoom() {
 
     useEffect(() => {
         if (roomID !== "" && playerID !== ""){
-            addPlayer()
+            navigateToWaitingRoom()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomID, playerID])

@@ -6,9 +6,9 @@ function Submit() {
     const { roomId } = useParams();
 
     const [parsedJson, setParsedJson] = useState(null)
+    const [ended, setEnded] = useState(false)
 
     const fetchResult = ()=>{
-        {console.log("asking for scorebord")}
         const url = `${constants.base}/event/${roomId}`
         fetch(url)
         .then(res => {
@@ -20,14 +20,21 @@ function Submit() {
         }).then(jsonData => {
             setParsedJson(jsonData)
         }).catch(error => {
-            console.log(error)
+            setEnded(true)
+            return error
         })
     }
 
     useEffect(() => {
+        if(ended) {
+            clearInterval(interval)
+            return
+        }
+
         fetchResult()
 
         const interval = setInterval(() => {
+            console.log("making fetch submit call")
             fetchResult()
         }, 5000)
 
@@ -40,7 +47,6 @@ function Submit() {
                 <>
                     <h1>ScoreCard : {roomId}</h1>
                     <div className="Players">
-                        {console.log(parsedJson)}
                         <ul>
                             {
                                 parsedJson.score_card.map((item, index) => {
