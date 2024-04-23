@@ -199,7 +199,7 @@ func (h *Handler) EvaluteResult(roomID string) *models.ScoreCard {
 	return &result
 }
 
-func (h *Handler) SSE(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetResult(w http.ResponseWriter, r *http.Request) {
 	utils.SetHttpHeaders(&w)
 
 	params := mux.Vars(r)
@@ -207,9 +207,22 @@ func (h *Handler) SSE(w http.ResponseWriter, r *http.Request) {
 
 	result := h.EvaluteResult(roomID)
 
-	if result != nil {
-		json.NewEncoder(w).Encode(result)
+	if result == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Fatalf("cannot make the player result")
+
+		return
 	}
+
+	resultBytes, err := json.Marshal(result)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Fatalf("marshal error")
+
+		return
+	}
+
+	h.ns.Submission(roomID, resultBytes)
 }
 
 func (h *Handler) StartGame(w http.ResponseWriter, r *http.Request) {
@@ -227,7 +240,7 @@ func (h *Handler) StartGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.ns.PlayerStartGame(roomID)
+	err := h.ns.PlayerStartGame(roomID, endTime)
 	if err != nil {
 		log.Fatalf("error in nats start game %+v \n", err)
 		w.WriteHeader(http.StatusBadRequest)

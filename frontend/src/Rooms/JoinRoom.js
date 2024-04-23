@@ -8,7 +8,7 @@ function JoinRoom() {
     const navigate = useNavigate();
 
     const navigateToWaitingRoom = ()=> {
-        navigate(`/lobby/${roomID}/${playerID}/0`);
+        navigate(`/lobby/${roomID}/${playerID}/0/nan`);
     }
 
     const addParams = () => {

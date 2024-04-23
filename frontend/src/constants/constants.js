@@ -8,8 +8,6 @@ const PATHS = {
 	"e_result"      : "/evalute_result/",
 	"s_game"		:"/start_game/room/",
 	"d_game"		:"/destroy/room/",
-	
-	"endTime"		: 2 * 60 * 1000
 }
 
 export default PATHS

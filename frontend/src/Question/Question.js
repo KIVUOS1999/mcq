@@ -7,7 +7,7 @@ import paths from '../constants/constants'
 import QuestionOptions from './QuestionOptions'
 
 function Question() {
-    const { roomId, playerId, isAdmin } = useParams();
+    const { roomId, playerId, time } = useParams();
     const navigate = useNavigate()
     const [questionSet, setQuestionSet] = useState({
         Question: "",
@@ -15,12 +15,15 @@ function Question() {
         Id:""
     })
     
+    console.log("question>>", time)
+
     const [lenQues, setLenQues] = useState(0) 
     const [question, setQuestion] = useState()
     const [idx, setIdx] = useState(0)
     const [selectedOption, setSelectedOption] = useState(0);
     const [answer, setAnswer] = useState({})
     const [completed, setCompleted] = useState(false)
+    const [countdownTimer, setContDownTimer] = useState(time)
 
     const ns = useRef(false)
 
@@ -30,7 +33,7 @@ function Question() {
     const connectToNats = async () => {
         console.log("connecting to nats server from question", roomId)
         
-        const nc = await connect({ servers: "ws://localhost:4222" });
+        const nc = await connect({ servers: "ws://localhost:8222" });
         const sub = nc.subscribe(roomId);
 
         for await (const msg of sub) {
@@ -100,6 +103,12 @@ function Question() {
         if (ns.current == false){
             connectToNats()
         }
+
+        var x = setInterval(()=>{
+            setContDownTimer(prevTime => prevTime-1)
+        }, 1000)
+
+        return () => clearInterval(x);
         // eslint-disable-next-line
     }, [])
 
@@ -157,6 +166,7 @@ function Question() {
                     <ul>
                         <QuestionOptions qs={questionSet} si={selectedOption} ssi={setSelectedOption}/>
                     </ul>
+                    <div className="timer">{countdownTimer}</div>
                     {completed ? <button onClick={submit}>Submit</button>  : <button onClick={nxt} id={questionSet.Id}>NextQuestion</button>}
                 </>
             )}

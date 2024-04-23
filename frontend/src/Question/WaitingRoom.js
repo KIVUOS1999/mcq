@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import paths from "../constants/constants"
 
 const WaitingRoom = (props)  => {
-    const { roomId, playerId, isAdmin } = useParams();
+    const { roomId, playerId, isAdmin, time } = useParams();
 
     const [messages, setMessages] = useState([]);
     const [natsSubs, setNatsSubs] = useState()
@@ -13,13 +13,14 @@ const WaitingRoom = (props)  => {
     const isAddPlayerApiCalled = useRef(false)
 
     const startGame = "startGame:"
-
     const navigate = useNavigate()
+
+    console.log(time, time*60*1000)
 
     // settingup nats consumer
     useEffect(() => {
         const connectToNats = async () => {
-            const nc = await connect({ servers: "ws://localhost:4222" });
+            const nc = await connect({ servers: "ws://localhost:8222" });
             const sub = nc.subscribe(roomId);
             
             setNatsSubs(sub)
@@ -35,16 +36,17 @@ const WaitingRoom = (props)  => {
     // nats player addition and starting game
     useEffect(()=>{
         const data = messages._rdata
-        const players = new TextDecoder().decode(data)
+        const natsData = new TextDecoder().decode(data)
 
-        if (players.startsWith(startGame)) {
+        if (natsData.startsWith(startGame)) {
             console.log("game has started")
+            const timeData = natsData.split(":")[1]
 
-            navigate(`/question/${roomId}/${playerId}/${isAdmin}`)
+            navigate(`/question/${roomId}/${playerId}/${timeData}`)
             return
         }
 
-        setPlayersInLobby(players)
+        setPlayersInLobby(natsData)
     }, [messages])
 
     useEffect(()=>{
@@ -76,7 +78,7 @@ const WaitingRoom = (props)  => {
 
     // admin start button action
     const sendStartMessage = () => {
-        const url = paths.base + paths.s_game + roomId + "/endtime/" + paths.endTime
+        const url = paths.base + paths.s_game + roomId + "/endtime/" + (time*60*1000)
         fetch(url)
         .then(res => {
             if(!res.ok) {

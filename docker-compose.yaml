@@ -1,0 +1,34 @@
+version: '3'
+services:
+  nats:
+    image: nats:alpine
+    expose:
+      - "4222"
+      - "8222"
+    ports:
+      - "4222:4222"   # Expose NATS port
+      - "8222:8222"   # Expose WebSocket port
+    volumes:
+      - ./nats-configure.conf:/etc/nats/nats-server.conf
+      
+  backend:
+    build:
+      context: ./bkend
+      dockerfile: Dockerfile
+    links:
+      - nats
+    environment:
+      - NATS_URL=nats://nats:4222
+    ports:
+      - "8000:8000"
+    depends_on:
+      - nats
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend

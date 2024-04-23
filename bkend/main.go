@@ -23,9 +23,7 @@ func main() {
 	router.HandleFunc(constants.START_GAME, handler.StartGame).Methods("GET")
 	router.HandleFunc(constants.END_GAME, handler.EndGame).Methods("GET")
 
-	// router.HandleFunc(constants.EVALUTE_RESULT, handler.EvaluteResult).Methods("GET")``
-
-	router.HandleFunc("/event/{room_id}", handler.SSE)
+	router.HandleFunc("/get_result/{room_id}", handler.GetResult)
 
 	http.ListenAndServe(":8000", router)
 }

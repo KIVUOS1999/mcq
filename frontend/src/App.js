@@ -10,8 +10,8 @@ function App() {
       <div className="App">
         <Routes>
           <Route exact path="/" element={<Room />}/>
-          <Route path="/question/:roomId/:playerId/:isAdmin" element={<Question />}/>
-          <Route path="/lobby/:roomId/:playerId/:isAdmin" element={<WaitingRoom />}/>
+          <Route path="/question/:roomId/:playerId/:time" element={<Question />}/>
+          <Route path="/lobby/:roomId/:playerId/:isAdmin/:time" element={<WaitingRoom />}/>
           <Route path="/submit/:roomId" element={<Submit />}/>
         </Routes>
       </div>

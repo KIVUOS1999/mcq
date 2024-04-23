@@ -2,6 +2,8 @@ package nats
 
 import (
 	"log"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/nats-io/nats.go"
@@ -12,7 +14,11 @@ type NatsStruct struct {
 }
 
 func NewNats() (*NatsStruct, error) {
-	nc, err := nats.Connect(nats.DefaultURL)
+	natsUrl := strings.TrimSpace(os.Getenv("NATS_URL"))
+
+	log.Println("checking for nats in ", natsUrl)
+
+	nc, err := nats.Connect(natsUrl)
 
 	if err != nil {
 		return nil, err
@@ -31,8 +37,8 @@ func (nc *NatsStruct) PlayerJoinMessage(roomID string, players []string) error {
 	return nil
 }
 
-func (nc *NatsStruct) PlayerStartGame(roomID string) error {
-	err := nc.natsConn.Publish(roomID, []byte("startGame:"+roomID))
+func (nc *NatsStruct) PlayerStartGame(roomID string, endTime int) error {
+	err := nc.natsConn.Publish(roomID, []byte("startGame:"+strconv.Itoa(endTime/1000)))
 	if err != nil {
 		return err
 	}
@@ -42,6 +48,15 @@ func (nc *NatsStruct) PlayerStartGame(roomID string) error {
 
 func (nc *NatsStruct) EndGame(roomID string) error {
 	err := nc.natsConn.Publish(roomID, []byte("submit_game"))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (nc *NatsStruct) Submission(roomID string, resultData []byte) error {
+	err := nc.natsConn.Publish(roomID, resultData)
 	if err != nil {
 		return err
 	}
