@@ -4,16 +4,17 @@ const PATH = "./question.json"
 
 // Params
 const (
-	ROOM_ID    = "room_id"
-	PLAYER_ID  = "player_id"
-	ENDGAME_ID = "end_time"
-	TIME       = "room_time"
-	ADMIN      = "admin"
+	ROOM_ID        = "room_id"
+	PLAYER_ID      = "player_id"
+	ENDGAME_ID     = "end_time"
+	TIME           = "room_time"
+	ADMIN          = "admin"
+	QUESTION_COUNT = "question_count"
 )
 
 // Paths
 const (
-	GET_MCQ        = "/get_mcq"
+	GET_MCQ        = "/get_mcq/room/{" + ROOM_ID + "}/count/{" + QUESTION_COUNT + "}/admin/{" + ADMIN + "}"
 	SUBMIT_MCQ     = "/submit_mcq"
 	CREATE_ROOM    = "/create_room"
 	ADD_PLAYER     = "/add_player/room/{" + ROOM_ID + "}/player/{" + PLAYER_ID + "}/admin/{" + ADMIN + "}"

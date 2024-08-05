@@ -2,6 +2,7 @@ version: '3'
 services:
   nats:
     image: nats:alpine
+    container_name: nats
     expose:
       - "4222"
       - "8222"
@@ -10,18 +11,47 @@ services:
       - "8222:8222"   # Expose WebSocket port
     volumes:
       - ./nats-configure.conf:/etc/nats/nats-server.conf
-      
-  backend:
-    build:
-      context: ./bkend
-      dockerfile: Dockerfile
-    links:
-      - nats
-    environment:
-      - NATS_URL=nats://nats:4222
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports: 
+      - 6379:6379
+
+  backend-redis:
+    image: golang:latest
+    container_name: backend-redis
+    command: ["sh", "-c", "cd /app && ./bkend-redis"]
+    volumes:
+      - ./build:/app
+      - ./bkend-redis/configs:/app/configs
     ports:
-      - "8000:8000"
+      - 8003:8003
     depends_on:
+      - redis
+    
+  backend-db:
+    image: golang:latest
+    container_name: backend-db
+    command: ["sh", "-c", "cd /app && ./bkend-db"]
+    volumes:
+      - ./build:/app
+      - ./bkend-db/configs:/app/configs
+    ports:
+      - 8004:8004
+
+  backend:
+    image: golang:latest
+    container_name: backend
+    command: ["sh", "-c", "cd /app && ./bkend"]
+    volumes:
+      - ./build:/app
+      - ./bkend/configs:/app/configs
+    ports:
+      - 8000:8000
+    depends_on:
+      - backend-db
+      - backend-redis
       - nats
 
   frontend:

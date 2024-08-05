@@ -2,32 +2,27 @@ package utils
 
 import (
 	"encoding/json"
-	"io"
-	"os"
+	"fmt"
+	"net/http"
 
-	"github.com/mcq_backend/constants"
 	"github.com/mcq_backend/models"
 )
 
 func ReadJSON() (*models.McqArray, error) {
-	jsonFile, err := os.Open(constants.PATH)
-	defer jsonFile.Close()
-
-	if err != nil {
-		return nil, err
-	}
-
-	jsonContent, err := io.ReadAll(jsonFile)
+	url := "http://localhost:8004/get_question/10"
+	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
 
 	var jsonArray models.McqArray
 
-	err = json.Unmarshal(jsonContent, &jsonArray)
+	err = json.NewDecoder(resp.Body).Decode(&jsonArray)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(jsonArray)
 
 	return &jsonArray, nil
 }

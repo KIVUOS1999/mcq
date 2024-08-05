@@ -1,14 +1,14 @@
 package models
 
 type McqStruct struct {
-	ID       int               `json:"id"`
+	ID       string            `json:"id"`
 	Question string            `json:"question,omitempty"`
 	Options  map[string]string `json:"options,omitempty"`
-	Answer   int               `json:"answer,omitempty"`
+	Answer   string            `json:"answer,omitempty"`
 }
 
 type McqArray struct {
-	QuestionSet []McqStruct `json:"question_set,omitempty"`
+	QuestionSet []McqStruct `json:"data,omitempty"`
 }
 
 type McqAnswer struct {
@@ -22,6 +22,20 @@ type PlayerPerformance struct {
 	CorrectAnswer int    `json:"correct_answer"`
 }
 
+type PlayerPerformanceDetailQuestionSet struct {
+	Question       string `json:"question"`
+	SelectedOption int    `json:"selected_option"`
+	SelectedAnswer string `json:"selected_answer"`
+	CorrectOption  int    `json:"correct_option"`
+	CorrectAnswer  string `json:"correct_answer"`
+}
+
+type PlayerPerformanceDetail struct {
+	PlayerID          string                                        `json:"player_id"`
+	DetailQusetionSet map[string]PlayerPerformanceDetailQuestionSet `json:"detailed_answer_set"`
+}
+
 type ScoreCard struct {
-	ScoreCard []PlayerPerformance `json:"score_card"`
+	ScoreCard []PlayerPerformance       `json:"score_card"`
+	Detail    []PlayerPerformanceDetail `json:"detail"`
 }
