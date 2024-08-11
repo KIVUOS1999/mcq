@@ -18,4 +18,4 @@ mv bkend $path_to_build
 
 cd ..
 
-docker compose -f docker-compose.yaml up
+docker-compose -f docker-compose.yaml up --build --scale backend=3

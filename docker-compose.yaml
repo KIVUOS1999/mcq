@@ -1,5 +1,15 @@
 version: '3'
 services:
+  nginx:
+    container_name: nginx
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
+
   nats:
     image: nats:alpine
     container_name: nats
@@ -11,12 +21,21 @@ services:
       - "8222:8222"   # Expose WebSocket port
     volumes:
       - ./nats-configure.conf:/etc/nats/nats-server.conf
+    restart: unless-stopped
 
   redis:
     image: redis:latest
     container_name: redis
-    ports: 
+    ports:
       - 6379:6379
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - 27017:27017
+    restart: unless-stopped
 
   backend-redis:
     image: golang:latest
@@ -29,7 +48,8 @@ services:
       - 8003:8003
     depends_on:
       - redis
-    
+    restart: unless-stopped
+
   backend-db:
     image: golang:latest
     container_name: backend-db
@@ -39,20 +59,24 @@ services:
       - ./bkend-db/configs:/app/configs
     ports:
       - 8004:8004
+    depends_on:
+      - mongo
+    restart: unless-stopped
 
   backend:
     image: golang:latest
-    container_name: backend
+    hostname: backend
     command: ["sh", "-c", "cd /app && ./bkend"]
     volumes:
       - ./build:/app
       - ./bkend/configs:/app/configs
-    ports:
-      - 8000:8000
+    expose:
+      - "8000"
     depends_on:
       - backend-db
       - backend-redis
       - nats
+    restart: unless-stopped
 
   frontend:
     build:
@@ -62,3 +86,4 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    restart: unless-stopped
