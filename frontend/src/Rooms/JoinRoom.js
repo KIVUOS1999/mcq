@@ -28,10 +28,9 @@ function JoinRoom() {
 
     return(
         <div className="JoinRoom">
-            <h2>Join Room</h2>
-            Enter Name: <input type="text" id="player"></input><br/>
-            Room Code: <input type="text" id="room"></input><br/>
-            <button onClick={addParams}>Join Room</button>
+            <input className="Text Name" type="text" id="player" placeholder="Name" required></input>
+            <input className="Text RoomCode" type="text" id="room" placeholder="Room Code" required></input>
+            <button className="Btn ActionBtn" onClick={addParams}>Join Room</button>
         </div>
     )
 }

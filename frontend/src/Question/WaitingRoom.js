@@ -6,8 +6,6 @@ import paths from "../constants/constants";
 const WaitingRoom = (props) => {
   const { roomId, playerId, isAdmin, time } = useParams();
 
-  console.log("nats endpoint:", process.env.REACT_APP_NATS_WEBSOCKET)
-
   const [messages, setMessages] = useState([]);
   const [natsSubs, setNatsSubs] = useState();
   const [playersInLobby, setPlayersInLobby] = useState("");
