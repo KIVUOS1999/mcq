@@ -165,12 +165,14 @@ function Question() {
 
 	return (
 		<div className="Question Block">
-			<h2>{`Welcome ${playerId} in Room: ${roomId}`}</h2>
 			{questionSet.Question !== "" && (
 				<>
+					<h2>{`Welcome ${playerId} in Room: ${roomId}`}</h2>
+					
 					<div className="Question">
 						Q: {questionSet.Question}
 					</div>
+					
 					<ul>
 						<QuestionOptions
 							qs={questionSet}
@@ -178,7 +180,9 @@ function Question() {
 							ssi={setSelectedOption}
 						/>
 					</ul>
+					
 					<div className="timer">{countdownTimer}</div>
+					
 					{completed ? (
 						<button onClick={submit}>Submit</button>
 					) : (

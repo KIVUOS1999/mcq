@@ -3,5 +3,5 @@ body {
     padding: 0;
     font-family: "Poppins", sans-serif;
     background-color: #FCF6F5;
-    overflow: hidden;
+    overflow-x: hidden;
 }
