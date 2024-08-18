@@ -5,6 +5,11 @@ import { connect } from "nats.ws";
 
 import paths from "../constants/constants";
 import QuestionOptions from "./QuestionOptions";
+import "./Question.css"
+
+import { GrCaretNext } from "react-icons/gr";
+import { FaUserAstronaut } from "react-icons/fa";
+import { AiFillClockCircle } from "react-icons/ai";
 
 function Question() {
 	const { roomId, playerId, time, admin } = useParams();
@@ -164,33 +169,35 @@ function Question() {
 	};
 
 	return (
-		<div className="Question Block">
+		<div className="question_block">
+			<div className="question_header">
+				<div className="userID"><FaUserAstronaut/> {playerId}</div>
+				<div className="timer">{countdownTimer} sec</div>
+			</div>
 			{questionSet.Question !== "" && (
-				<>
-					<h2>{`Welcome ${playerId} in Room: ${roomId}`}</h2>
-					
-					<div className="Question">
-						Q: {questionSet.Question}
+				<div className="question_container">
+					<div className="question_section">
+						<div className="question_question">
+							Q: {questionSet.Question}
+						</div>
+						
+						<div className="question_options_conatiner">
+							<QuestionOptions
+								qs={questionSet}
+								si={selectedOption}
+								ssi={setSelectedOption}
+							/>
+						</div>
 					</div>
-					
-					<ul>
-						<QuestionOptions
-							qs={questionSet}
-							si={selectedOption}
-							ssi={setSelectedOption}
-						/>
-					</ul>
-					
-					<div className="timer">{countdownTimer}</div>
-					
 					{completed ? (
-						<button onClick={submit}>Submit</button>
-					) : (
-						<button onClick={nxt} id={questionSet.Id}>
-							NextQuestion
+						<button className="question_submit" onClick={submit}>Submit</button>
+						) : (
+						<button className="question_submit" onClick={nxt} id={questionSet.Id}>
+							<GrCaretNext />
 						</button>
 					)}
-				</>
+					
+				</div>
 			)}
 		</div>
 	);
