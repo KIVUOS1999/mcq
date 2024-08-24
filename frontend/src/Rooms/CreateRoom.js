@@ -14,9 +14,7 @@ function CreateRoom() {
 	};
 
 	const createRoomAPI = () => {
-		// console.log("baseurl", process.env.REACT_APP_BACKEND_BASE);
 		const url = process.env.REACT_APP_BACKEND_BASE + paths.c_room;
-		console.log("url", url)
 		fetch(url)
 			.then((res) => {
 				if (!res.ok) {
@@ -38,10 +36,10 @@ function CreateRoom() {
 				setRoomID(roomNo);
 
 				const player = document.getElementById("player_name");
-				const player_time = document.getElementById("time");
+				const player_time = document.getElementById("time").innerHTML;
 
 				setPlayerID(player.value);
-				setTime(player_time.value);
+				setTime(player_time);
 			})
 			.catch((error) => {
 				// console.log(error);
@@ -59,15 +57,86 @@ function CreateRoom() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [roomID, playerID]);
 
+	// Event listener for time increase
+	let intervalId = null
+	const intervalTime = 250
+
+	useEffect(() => {
+		const increaseButton = document.getElementById("TimeInc");
+		increaseButton.addEventListener("mousedown", startIncrementing);
+		increaseButton.addEventListener("mouseup", stopIncrementing);
+		increaseButton.addEventListener("mouseleave", stopIncrementing);
+		increaseButton.addEventListener("click", incTime)
+
+		const decreaseButton = document.getElementById("TimeDec")
+		decreaseButton.addEventListener("mousedown", startDecrementing);
+		decreaseButton.addEventListener("mouseup", stopIncrementing);
+		decreaseButton.addEventListener("mouseleave", stopIncrementing);
+		decreaseButton.addEventListener("click", decTime)
+	}, [])
+
+	const incTime = () => {
+		const timeElement = document.getElementById("time");
+		let currentTime = parseInt(timeElement.innerHTML, 10);
+		if (currentTime >= 60){
+			return
+		}
+		currentTime++;
+		timeElement.innerHTML = currentTime;
+	};
+
+	const decTime = () => {
+		const timeElement = document.getElementById("time");
+		let currentTime = parseInt(timeElement.innerHTML, 10);
+		if (currentTime <= 1) {
+			return
+		}
+		currentTime--;
+		timeElement.innerHTML = currentTime;
+	};
+
+	const startIncrementing = ()=> {
+		if (intervalId !== null) {
+			clearInterval(intervalId)
+		}
+
+		intervalId = setInterval(incTime, intervalTime)
+	}
+
+	const startDecrementing = ()=> {
+		if (intervalId !== null) {
+			clearInterval(intervalId)
+		}
+
+		intervalId = setInterval(decTime, intervalTime)
+	}
+
+	const stopIncrementing = ()=>{
+		if (intervalId !== null) {
+			clearInterval(intervalId);
+			intervalId = null;
+		}
+	}
+
 	return (
 		<div className="CreateRoom">
-			<h2>Create Room</h2>
-			Enter Name: <input id="player_name" type="text"></input>
-			<br />
-			Enter mins: <input id="time" type="text"></input>
-			<br />
-			<button onClick={createRoomAddPlayer}>Generate RoomCode</button>
-			<br />
+			<input className="Text Name" id="player_name" type="text" placeholder="Name" required></input>
+			<div className="Time">
+				<div className="TimeActions">
+					<button className="Btn TimeBtn" id="TimeDec">-</button>
+					<div id="time">1</div><span>minute</span>
+					<button className="Btn TimeBtn" id="TimeInc">+</button>
+				</div>
+			</div>
+			<div className="Questions">
+				<div className="Label">Question</div>
+				<div className="QuestionActions">
+					<button className="QuestionBtn" id="incQuestion">-</button>
+					<div id="quesion">1</div>
+					<button className="QuestionBtn" id="decQuestion">+</button>
+				</div>
+			</div>
+			<button className="Btn ActionBtn" onClick={createRoomAddPlayer}>Create Room</button>
 		</div>
 	);
 }

@@ -1,0 +1,101 @@
+.question_container{
+    display: flex;
+    height: 80vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.question_header{
+    align-items: center;
+    padding: 20px;
+    background-color: #990011;
+    color: white;
+    font-size: large;
+    display: flex;
+    box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+}
+
+.userID {
+    flex: 3;
+}
+
+.question_submit{
+    margin: 0 0 0 20px;
+    background-color: #990011;
+    color: white;
+    border-style: none;
+    border-radius: 100px;
+    width: 80px;
+    height: 80px;
+    padding: 5px;
+    font-size: large;
+    transition: 0.2s;
+}
+
+.question_submit:hover {
+    font-size: x-large;
+    box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+}
+
+.question_section {
+    width: 700px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.question_question {
+    margin-bottom: 20px;
+}
+
+.userID svg {
+    margin-right: 10px;
+}
+
+.timer{
+    background-color: #69010d;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.question_options{
+    padding: 10px;
+    border: dashed;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border-color: gray;
+    margin-left: 20px;
+    transition: 0.2s;
+}
+
+.question_options:hover {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+}
+
+.question_options_active {
+    background-color: #990011;
+    color: white;
+    border: none;
+    padding: 11px;
+}
+
+@media (max-width: 600px) {
+    .question_container {
+      flex-direction: column;
+    }
+
+    .question_section {
+        width: 100%;
+    }
+
+    .question_submit{
+        margin: 40px 0 0 0;
+        width: 100%;
+        padding: 10px;
+        height: fit-content;
+    }
+
+    .question_options{
+        margin-left: 0px;
+    }
+  }

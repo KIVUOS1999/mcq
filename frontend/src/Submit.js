@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { connect } from "nats.ws";
+import "./Submit.css"
 
 function Submit() {
 	const { roomId } = useParams();
@@ -8,6 +9,7 @@ function Submit() {
 	const [parsedJson, setParsedJson] = useState(null);
 	const [messages, setMessages] = useState("");
 	const [natsSubs, setNatsSubs] = useState();
+	const [details, setDetails] = useState("")
 
 	useEffect(() => {
 		const connectToNats = async () => {
@@ -49,47 +51,47 @@ function Submit() {
 		fetch(url)
 	}, [natsSubs]);
 
+	const getAnswerSet = (val) => {
+		return (
+			<div className={`detailed_answer_section ${String(val.selected_option) === "0"?"no_answer": (String(val.selected_option) === String(val.correct_option)?"correct_answer":"wrong_answer")}`}>
+				<div className="question">{val.question}</div>
+				<div className="selected_option">{String(val.selected_option) === "0" ? "Not answered": `Selected Option: ${val.selected_option}`}</div>
+				<div className="correct_option">Correct Option: {val.correct_option} - {val.correct_answer}</div>
+			</div>
+		)
+	}
+
+	const getDetails = (player_id)=>{
+		console.log(`showing ans for player ${player_id}`)
+		console.debug(parsedJson)
+		if (player_id == "") return null
+		const player_detail = parsedJson.detail.find((item) => item.player_id === player_id);
+		console.log("pd", player_detail)
+		if (!player_detail) return null
+		return Object.entries(player_detail.detailed_answer_set).map(([key, val]) =>(getAnswerSet(val))) 
+	}
+
+	const show_details = (player_id) => {
+		setDetails(player_id)
+	}
+
 	return (
-		<div className="ScoreCard">
+		<div className="scoreCard">
+			<div className="scorecard-head">Score</div>
 			{parsedJson && (
 				<div className="score_card_section">
-					<h1>ScoreCard : {roomId}</h1>
-					<div className="Players">
-						<ul>
-							{parsedJson.score_card.map((item, index) => {
-								return (
-									<li key={index}>
-										{item.player_id} :{" "}
-										{item.correct_answer === -1
-											? "Yet to answer"
-											: item.correct_answer}
-									</li>
-								);
-							})}
-						</ul>
-						<h2>Details</h2>
-
-						{parsedJson.detail.map((item, index) => {
+					<div className="player_scores">
+						{parsedJson.score_card.map((item, index) => {
 							return (
-								<div className="details">
-									<h3 className="player_name">player name: {item.player_id}</h3>
-									<div className="detailed_answer">
-										{Object.entries(item.detailed_answer_set).map(([key, val], idx) => {
-											return (
-												<div className="detailed_answer_section">
-													<div className="question">Q. {val.question}</div>
-													<div className="selected_option">Selected Option: {val.selected_option}</div>
-													<div className="correct_option">Correct Option: {val.correct_option} - {val.correct_answer}</div>
-													<div className="is_correct">{String(val.selected_option) === String(val.correct_option) ? "Correct": "Incorrect"}</div>
-													<br/>
-												</div>
-											)
-										})}
-									</div>
+								<div key={index} className="score_element" onClick={()=>{show_details(item.player_id)}}>
+									{item.player_id} : {item.correct_answer === -1 ? "Yet to answer" : item.correct_answer}
 								</div>
-							)
+							);
 						})}
+					</div>
 
+					<div className="detail">
+						{getDetails(details)}
 					</div>
 				</div>
 			)}
