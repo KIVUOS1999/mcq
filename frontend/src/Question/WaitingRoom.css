@@ -40,7 +40,7 @@
 }
 
 .Lobby {
-    background-color: #990011;;
+    background-color: #990011;
     padding: 20px;
     color: white;
     font-size: large;
@@ -79,4 +79,9 @@
 
 .Total_count {
     margin-top: 20px;
+}
+
+.Room_copy:hover {
+    transition: 0.2s;
+    color: #ff919e;
 }

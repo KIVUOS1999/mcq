@@ -4,9 +4,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import paths from "../constants/constants";
 import { FaUserCircle, FaHome, FaCopy } from 'react-icons/fa';
 import './WaitingRoom.css'
+import {Toaster, toast} from 'sonner'
+
 
 const WaitingRoom = (props) => {
-	const { roomId, playerId, isAdmin, time } = useParams();
+	const { roomId, playerId, isAdmin, time, questionNumbers } = useParams();
 
 	const [messages, setMessages] = useState([]);
 	const [natsSubs, setNatsSubs] = useState();
@@ -16,8 +18,6 @@ const WaitingRoom = (props) => {
 
 	const startGame = "startGame:";
 	const navigate = useNavigate();
-
-	// console.log(time, time * 60 * 1000);
 
 	// settingup nats consumer
 	useEffect(() => {
@@ -50,13 +50,13 @@ const WaitingRoom = (props) => {
 			fetch(url)
 				.then((res) => {
 					if (res.ok) {
-						navigate(`/question/${roomId}/${playerId}/${timeData}/${isAdmin}`);
+						navigate(`/question/${roomId}/${playerId}/${timeData}/${isAdmin}`, {replace: true});
 					}
 					if (!res.ok) {
 						throw new Error(`HTTP fetch error Status: ${res.status}`);
 					}
 				}).catch((error) => {
-					console.error("error creating question", error)
+					toast.error("error creating question", error)
 				})
 
 			return
@@ -67,11 +67,16 @@ const WaitingRoom = (props) => {
 
 	useEffect(() => {
 		if (natsSubs !== undefined && !isAddPlayerApiCalled.current) {
-			// console.log("Calling add player API");
 			addPlayer();
 			isAddPlayerApiCalled.current = true;
 		}
 	}, [natsSubs]);
+
+	const copyBtnOnClick = () => {
+		var room_code = document.getElementById("room_id").innerHTML
+		navigator.clipboard.writeText(room_code)
+		toast.success("Room id copied")
+	}
 
 	const addPlayer = () => {
 		const url =
@@ -121,6 +126,7 @@ const WaitingRoom = (props) => {
 				console.error(error);
 			});
 	};
+	
 	let playersArray = playersInLobby.split(';').filter(player => player.trim() !== '');
 
 	return (
@@ -128,8 +134,8 @@ const WaitingRoom = (props) => {
 			<div className="content">
 				<div className="Lobby">
 					<div className="Room_icon"><FaHome /></div>
-					<div className="Room_id">{roomId}</div>
-					<div className="Room_copy"><FaCopy /></div>
+					<div className="Room_id" id="room_id">{roomId}</div>
+					<div className="Room_copy" id="copy_btn" onClick={copyBtnOnClick}><FaCopy /></div>
 				</div>
 				<div className="Total_count"><b>Joined</b> {playersArray.length}</div>
 				<div className="Player_id">
@@ -148,6 +154,7 @@ const WaitingRoom = (props) => {
 			<div className="Start-Button">
 				{isAdmin == 1 ? <button className="Start_game" onClick={sendStartMessage}>Start</button> : ""}
 			</div>
+			<Toaster />
 		</div>
 	);
 };
