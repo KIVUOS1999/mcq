@@ -9,7 +9,7 @@ import "./Question.css"
 
 import { GrCaretNext } from "react-icons/gr";
 import { FaUserAstronaut } from "react-icons/fa";
-import { AiFillClockCircle } from "react-icons/ai";
+import { toast, Toaster } from "sonner";
 
 function Question() {
 	const { roomId, playerId, time, admin } = useParams();
@@ -23,7 +23,8 @@ function Question() {
 	const [lenQues, setLenQues] = useState(0);
 	const [question, setQuestion] = useState();
 	const [idx, setIdx] = useState(0);
-	const [selectedOption, setSelectedOption] = useState(0);
+	const [selectedOption, setSelectedOption] = useState(-1);
+	const [questionID, setQuestionID] = useState("")
 	const [answer, setAnswer] = useState({});
 	const [completed, setCompleted] = useState(false);
 	const [countdownTimer, setContDownTimer] = useState(time);
@@ -49,7 +50,6 @@ function Question() {
 	// getting questions set from server
 	const getQuestionSet = (route) => {
 		const url = `${process.env.REACT_APP_BACKEND_BASE}${route}`;
-		// console.log(">> fetching", url)
 
 		fetch(url)
 			.then((res) => {
@@ -60,9 +60,8 @@ function Question() {
 				return res.json();
 			})
 			.then((data) => {
-				// console.log(data, data.data.length)
+				console.log("fetched question set:", data)
 				setQuestion(data);
-
 				setLenQues(data.data.length);
 			})
 			.catch((error) => {
@@ -72,6 +71,7 @@ function Question() {
 
 	// submitting answers for the player
 	const submitAnswersCall = (jsonBody) => {
+		console.debug("json", jsonBody)
 		const url = `${process.env.REACT_APP_BACKEND_BASE}${paths.a_answer}`;
 		fetch(url, {
 			method: "POST",
@@ -89,7 +89,7 @@ function Question() {
 					}
 					throw new Error(`HTTP fetch error Status: ${res.status}`);
 				} else {
-					navigate(`/submit/${roomId}`);
+					navigate(`/submit/${roomId}`, {replace: true});
 				}
 			})
 			.catch((error) => {
@@ -124,7 +124,8 @@ function Question() {
 
 	useEffect(() => {
 		if (question && question.data[idx]) {
-			// console.log('>>', question.data[idx])
+			console.log(question.data[idx])
+			setQuestionID(question.data[idx].id)
 			setQuestionSet({
 				Question: question.data[idx].question,
 				Options: question.data[idx].options,
@@ -142,17 +143,28 @@ function Question() {
 
 	// Button Functions
 	let nxt = (e) => {
-		if (idx + 1 === lenQues) {
-			setCompleted(true);
-			return;
+		console.log(selectedOption)
+		if(selectedOption == -1) {
+			toast.error("Select an option")
+
+			return
 		}
+
+		const questionIndex = questionID;
+		const so = selectedOption + 1;
+		
+		console.log("question index", questionIndex)
+		console.log("selecte option", so)
+
+		setAnswer({ ...answer, [questionIndex]: so });
+
+		console.log("current answer set", idx, lenQues, answer)
 
 		setIdx(idx + 1);
 
-		const questionIndex = e.target.id.toString();
-		const so = selectedOption + 1;
-
-		setAnswer({ ...answer, [questionIndex]: so });
+		if (idx >= lenQues) {
+			setCompleted(true)
+		}
 	};
 
 	let submit = () => {
@@ -189,16 +201,15 @@ function Question() {
 							/>
 						</div>
 					</div>
-					{completed ? (
-						<button className="question_submit" onClick={submit}>Submit</button>
-						) : (
-						<button className="question_submit" onClick={nxt} id={questionSet.Id}>
-							<GrCaretNext />
-						</button>
-					)}
+					
+					<button className="question_submit" onClick={nxt} id={questionSet.Id}>
+						<GrCaretNext />
+					</button>
+					
 					
 				</div>
 			)}
+			<Toaster />
 		</div>
 	);
 }

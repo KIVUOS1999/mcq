@@ -1,16 +1,25 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import paths from "../constants/constants";
+import { toast, Toaster } from "sonner";
+
+function isValidInput(value) {
+    const isOK = /^[a-zA-Z0-9]+$/.test(value); // Regex for letters and numbers only
+    console.log(isOK)
+
+    return isOK
+}
 
 function CreateRoom() {
 	const [playerID, setPlayerID] = useState("");
 	const [roomID, setRoomID] = useState("");
 	const [time, setTime] = useState("");
+	const [questionNumbers, setQuestionNumbers] = useState(0)
 
 	const navigate = useNavigate();
 
 	const navigateToWaitingRoom = () => {
-		navigate(`/lobby/${roomID}/${playerID}/1/${time}`);
+		navigate(`/lobby/${roomID}/${playerID}/1/${time}`, {replace: true});
 	};
 
 	const createRoomAPI = () => {
@@ -42,12 +51,27 @@ function CreateRoom() {
 				setTime(player_time);
 			})
 			.catch((error) => {
-				// console.log(error);
+				toast.error(error)
 			});
 	};
 
 	const createRoomAddPlayer = () => {
-		createRoomAPI();
+		const player = document.getElementById("player_name")
+		const player_time = document.getElementById("time").innerHTML
+		console.log("pt",player_time)
+		const question_nos = document.getElementById("questions").value
+
+		if (!isValidInput(player.value)){
+            toast.error("Make your name cool but use numbers and alphabets")
+            return
+        }
+
+		if (question_nos <= 0 ) {
+			toast.error("you don't require questions?")
+			return
+		}
+
+		createRoomAPI(player.value, player_time, question_nos);
 	};
 
 	useEffect(() => {
@@ -121,6 +145,7 @@ function CreateRoom() {
 	return (
 		<div className="CreateRoom">
 			<input className="Text Name" id="player_name" type="text" placeholder="Name" required></input>
+			<input className="Text Question" id="questions" type="number" placeholder="Questions" required></input>
 			<div className="Time">
 				<div className="TimeActions">
 					<button className="Btn TimeBtn" id="TimeDec">-</button>
@@ -128,15 +153,8 @@ function CreateRoom() {
 					<button className="Btn TimeBtn" id="TimeInc">+</button>
 				</div>
 			</div>
-			<div className="Questions">
-				<div className="Label">Question</div>
-				<div className="QuestionActions">
-					<button className="QuestionBtn" id="incQuestion">-</button>
-					<div id="quesion">1</div>
-					<button className="QuestionBtn" id="decQuestion">+</button>
-				</div>
-			</div>
 			<button className="Btn ActionBtn" onClick={createRoomAddPlayer}>Create Room</button>
+			<Toaster/>
 		</div>
 	);
 }

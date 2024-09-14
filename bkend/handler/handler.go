@@ -47,6 +47,7 @@ func (h *Handler) createQuestionSet(roomID string, params map[string]string, w h
 	questionCount := params[constants.QUESTION_COUNT]
 
 	count, err := strconv.Atoi(questionCount)
+	log.Print("Question count", count)
 	if err != nil {
 		count = 10
 	}
@@ -103,7 +104,9 @@ func (h *Handler) getQuestionSet(roomID string, w http.ResponseWriter) {
 		return
 	}
 
-	log.Printf("Get question set; %+v", questionSet)
+	for i := range questionSet.QuestionSet {
+		questionSet.QuestionSet[i].Answer = ""
+	}
 
 	json.NewEncoder(w).Encode(questionSet)
 }
@@ -287,13 +290,15 @@ func (h *Handler) evaluteResult(roomID string) *models.ScoreCard {
 		return nil
 	}
 
+	log.Printf("real answers: %+v", questionSet)
+
 	correctAnswerList := map[string]int{}
 	pcd := models.PlayerPerformanceDetail{
 		DetailQusetionSet: map[string]models.PlayerPerformanceDetailQuestionSet{},
 	}
 
-	detailedAnswerSet := models.PlayerPerformanceDetailQuestionSet{}
 	for _, val := range questionSet.QuestionSet {
+		detailedAnswerSet := models.PlayerPerformanceDetailQuestionSet{}
 		intAnswer, _ := strconv.Atoi(val.Answer)
 		correctAnswerList[val.ID] = intAnswer
 
@@ -314,7 +319,11 @@ func (h *Handler) evaluteResult(roomID string) *models.ScoreCard {
 
 	for player, answerSet := range players {
 		pc := models.PlayerPerformance{}
-		playerPerformanceDetail := pcd
+		playerPerformanceDetail := models.PlayerPerformanceDetail{}
+
+		pcdByte, _ := json.Marshal(pcd)
+		json.Unmarshal(pcdByte, &playerPerformanceDetail)
+
 		correctAnswer := 0
 
 		if len(answerSet.Answers) == 1 {
