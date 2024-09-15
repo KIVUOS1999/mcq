@@ -5,7 +5,6 @@ import { toast, Toaster } from "sonner";
 
 function isValidInput(value) {
     const isOK = /^[a-zA-Z0-9]+$/.test(value); // Regex for letters and numbers only
-    console.log(isOK)
 
     return isOK
 }
@@ -19,7 +18,7 @@ function CreateRoom() {
 	const navigate = useNavigate();
 
 	const navigateToWaitingRoom = () => {
-		navigate(`/lobby/${roomID}/${playerID}/1/${time}`, {replace: true});
+		navigate(`/lobby/${roomID}/${playerID}/1/${time}/${questionNumbers}`, {replace: true});
 	};
 
 	const createRoomAPI = () => {
@@ -58,7 +57,6 @@ function CreateRoom() {
 	const createRoomAddPlayer = () => {
 		const player = document.getElementById("player_name")
 		const player_time = document.getElementById("time").innerHTML
-		console.log("pt",player_time)
 		const question_nos = document.getElementById("questions").value
 
 		if (!isValidInput(player.value)){
@@ -70,6 +68,8 @@ function CreateRoom() {
 			toast.error("you don't require questions?")
 			return
 		}
+
+		setQuestionNumbers(question_nos)
 
 		createRoomAPI(player.value, player_time, question_nos);
 	};

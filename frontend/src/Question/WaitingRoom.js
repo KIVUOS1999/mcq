@@ -8,7 +8,7 @@ import {Toaster, toast} from 'sonner'
 
 
 const WaitingRoom = (props) => {
-	const { roomId, playerId, isAdmin, time, questionNumbers } = useParams();
+	const { roomId, playerId, isAdmin, time, questions } = useParams();
 
 	const [messages, setMessages] = useState([]);
 	const [natsSubs, setNatsSubs] = useState();
@@ -112,7 +112,10 @@ const WaitingRoom = (props) => {
 			paths.s_game +
 			roomId +
 			"/endtime/" +
-			time * 60 * 1000;
+			time * 60 * 1000
+			+"/questions/" +
+			questions
+
 		fetch(url)
 			.then((res) => {
 				if (!res.ok) {

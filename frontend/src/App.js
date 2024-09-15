@@ -11,7 +11,7 @@ function App() {
         <Routes>
           <Route exact path="/" element={<Room />}/>
           <Route path="/question/:roomId/:playerId/:time/:admin" element={<Question />}/>
-          <Route path="/lobby/:roomId/:playerId/:isAdmin/:time" element={<WaitingRoom />}/>
+          <Route path="/lobby/:roomId/:playerId/:isAdmin/:time/:questions" element={<WaitingRoom />}/>
           <Route path="/submit/:roomId" element={<Submit />}/>
         </Routes>
       </div>

@@ -123,22 +123,9 @@ func (h *Handler) GetMCQ(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	roomID := params[constants.ROOM_ID]
-	admin, err := strconv.ParseBool(params[constants.ADMIN])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-
-		return
-	}
 
 	if roomID == "" {
 		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
-
-	if admin {
-		h.createQuestionSet(roomID, params, w)
 
 		return
 	}
@@ -434,7 +421,12 @@ func (h *Handler) StartGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.createQuestionSet(roomID, map[string]string{constants.QUESTION_COUNT: "10"}, w)
+	questionsCount := params[constants.QUESTION_COUNT]
+	if _, err := strconv.Atoi(questionsCount); err != nil {
+		questionsCount = "10"
+	}
+
+	h.createQuestionSet(roomID, map[string]string{constants.QUESTION_COUNT: questionsCount}, w)
 
 	err = h.ns.PlayerStartGame(roomID, endTime)
 	if err != nil {

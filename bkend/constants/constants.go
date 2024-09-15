@@ -20,7 +20,7 @@ const (
 	ADD_PLAYER     = "/add_player/room/{" + ROOM_ID + "}/player/{" + PLAYER_ID + "}/admin/{" + ADMIN + "}"
 	ADD_ANSWER     = "/add_answer"
 	EVALUTE_RESULT = "/evalute_result/{" + ROOM_ID + "}"
-	START_GAME     = "/start_game/room/{" + ROOM_ID + "}/endtime/{" + ENDGAME_ID + "}"
+	START_GAME     = "/start_game/room/{" + ROOM_ID + "}/endtime/{" + ENDGAME_ID + "}/questions/{" + QUESTION_COUNT + "}"
 	END_GAME       = "/destroy/room/{" + ROOM_ID + "}/time/{" + TIME + "}"
 )
 

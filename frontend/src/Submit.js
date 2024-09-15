@@ -62,11 +62,9 @@ function Submit() {
 	}
 
 	const getDetails = (player_id)=>{
-		console.log(`showing ans for player ${player_id}`)
 		console.debug(parsedJson)
 		if (player_id == "") return null
 		const player_detail = parsedJson.detail.find((item) => item.player_id === player_id);
-		console.log("pd", player_detail)
 		if (!player_detail) return null
 		return Object.entries(player_detail.detailed_answer_set).map(([key, val]) =>(getAnswerSet(val))) 
 	}

@@ -60,7 +60,7 @@ function Question() {
 				return res.json();
 			})
 			.then((data) => {
-				console.log("fetched question set:", data)
+				// console.log("fetched question set:", data)
 				setQuestion(data);
 				setLenQues(data.data.length);
 			})
@@ -124,7 +124,6 @@ function Question() {
 
 	useEffect(() => {
 		if (question && question.data[idx]) {
-			console.log(question.data[idx])
 			setQuestionID(question.data[idx].id)
 			setQuestionSet({
 				Question: question.data[idx].question,
@@ -143,7 +142,6 @@ function Question() {
 
 	// Button Functions
 	let nxt = (e) => {
-		console.log(selectedOption)
 		if(selectedOption == -1) {
 			toast.error("Select an option")
 
@@ -152,13 +150,8 @@ function Question() {
 
 		const questionIndex = questionID;
 		const so = selectedOption + 1;
-		
-		console.log("question index", questionIndex)
-		console.log("selecte option", so)
 
 		setAnswer({ ...answer, [questionIndex]: so });
-
-		console.log("current answer set", idx, lenQues, answer)
 
 		setIdx(idx + 1);
 
