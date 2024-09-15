@@ -103,12 +103,27 @@ input {
 }
 
 @media (max-width: 600px) {
+    .RoomBody{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: fit-content;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
     .RoomContainer, .ActionPart{
         width: 100%;    
+        box-shadow: none;
+        background: white;
     }
 
     .ActionPart {
         align-items: center;
         justify-content: center;
+    }
+
+    .svg-background{
+        display: none;
     }
 }

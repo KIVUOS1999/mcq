@@ -326,7 +326,7 @@ func (h *Handler) evaluteResult(roomID string) *models.ScoreCard {
 
 		correctAnswer := 0
 
-		if len(answerSet.Answers) == 1 {
+		if len(answerSet.Answers) == 0 {
 			// if the player has not yet submitted
 			correctAnswer = -1
 		} else {

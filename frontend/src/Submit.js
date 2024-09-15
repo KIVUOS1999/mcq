@@ -83,7 +83,7 @@ function Submit() {
 					<div className="player_scores">
 						{parsedJson.score_card.map((item, index) => {
 							return (
-								<div key={index} className="score_element" onClick={()=>{show_details(item.player_id)}}>
+								<div key={index} className={`${item.correct_answer === -1?"score_element_disable":"score_element"}`} onClick={()=>{show_details(item.player_id)}}>
 									{item.player_id} : {item.correct_answer === -1 ? "Yet to answer" : item.correct_answer}
 								</div>
 							);
