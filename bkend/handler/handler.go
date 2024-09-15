@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand/v2"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,6 +22,11 @@ import (
 	redisClient "github.com/bkend-redis/pkg/client"
 )
 
+type CustomError struct {
+	StatusCode int
+	Identifier int
+	Reason     string
+}
 type Handler struct {
 	redisService *redisClient.Client
 	dataService  *dataClient.Client
@@ -140,32 +146,56 @@ func (h *Handler) GetMCQ(w http.ResponseWriter, r *http.Request) {
 	h.getQuestionSet(roomID, w)
 }
 
+func (h *Handler) GenerateCode() string {
+	num := rand.IntN(900000)
+	randomNumber := num + 100000
+
+	return strconv.Itoa(randomNumber)
+}
+
 func (h *Handler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	utils.SetHttpHeaders(&w)
 
 	log.Print("CreateRoom - Enter")
 	defer log.Print("CreateRoom - Exit")
 
-	id := utils.GenerateUUID()
-	resp, err := h.redisService.CreateRoom(id)
+	for i := range 10 {
+		log.Println("Trying to generate room code attempt:", i)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"err": err.Error()})
+		id := h.GenerateCode()
 
+		resp, err := h.redisService.CreateRoom(id)
+		if err != nil {
+			fmt.Printf("Error - %+v", err)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"err": err.Error()})
+
+			return
+		}
+
+		defer resp.Body.Close()
+
+		customResp := CustomError{}
+		respBody, _ := io.ReadAll(resp.Body)
+		json.Unmarshal(respBody, &customResp)
+
+		if customResp.Identifier == 2 {
+			continue
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			w.WriteHeader(resp.StatusCode)
+
+			io.Copy(w, resp.Body)
+			return
+		}
+
+		json.NewEncoder(w).Encode(&models.McqAnswer{Room: id})
 		return
 	}
 
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		w.WriteHeader(resp.StatusCode)
-
-		io.Copy(w, resp.Body)
-		return
-	}
-
-	json.NewEncoder(w).Encode(&models.McqAnswer{Room: id})
+	w.WriteHeader(http.StatusInternalServerError)
 }
 
 func (h *Handler) AddPlayer(w http.ResponseWriter, r *http.Request) {
